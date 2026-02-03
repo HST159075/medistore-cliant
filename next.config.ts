@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        // ১. স্পেস রিমুভ করা হয়েছে এবং শেষে * যোগ করা হয়েছে
         source: "/api/auth/:path*",
         destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/:path*`, 
       },
