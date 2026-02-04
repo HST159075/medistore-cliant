@@ -84,7 +84,7 @@ export function RegisterForm() {
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} disabled={loading} />
+                    <Input placeholder="Enter you name" {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

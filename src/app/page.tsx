@@ -28,7 +28,7 @@ export default function Home() {
 
         <div className="container mx-auto flex flex-col items-center text-center relative z-10">
           <Badge className="mb-6 bg-blue-600 text-white hover:bg-blue-700 border-none px-6 py-1.5 rounded-full text-sm font-semibold animate-bounce">
-            Flash Delivery is Now Live! 🚀
+            Flash Delivery is Now Live! 
           </Badge>
           <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-6 leading-[1.1] tracking-tight">
             Your Trusted <span className="text-blue-600">Digital</span> <br />

@@ -152,7 +152,7 @@ export function LoginForm() {
         <div className="mt-6 text-center text-sm text-gray-500">
           Don&apos;t have an account?{" "}
           <Link
-            href="/register"
+            href="/Register"
             className="underline font-bold text-blue-600 hover:text-blue-800"
           >
             Create an Account

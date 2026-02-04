@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/seller-dashboard") ||
     pathname === "/checkout"; 
 
-  const isLoginPage = pathname === "/login" || pathname === "/register";
+  const isLoginPage = pathname === "/login" || pathname === "/Register";
 
   if (isProtectedPage && !session) {
     return NextResponse.redirect(new URL("/login", request.url));
