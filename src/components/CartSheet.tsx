@@ -1,13 +1,13 @@
 "use client";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger, 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
   SheetClose,
-  SheetDescription // ✅ ১. এটি ইমপোর্ট করো
-} from "@/components/ui/sheet"; 
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -28,13 +28,13 @@ export function CartSheet() {
           )}
         </Button>
       </SheetTrigger>
-      
+
       <SheetContent className="bg-white text-black flex flex-col h-full w-[350px] sm:w-[400px]">
         <SheetHeader className="border-b pb-4">
           <SheetTitle className="text-2xl font-bold flex items-center gap-2 text-black">
             <ShoppingCart className="text-blue-600" /> Your Cart
           </SheetTitle>
-          {/* ✅ ২. এটি যোগ করো এররটি দূর করার জন্য */}
+          
           <SheetDescription className="text-gray-500">
             Review your selected medicines before checkout.
           </SheetDescription>
@@ -48,16 +48,19 @@ export function CartSheet() {
           ) : (
             <div className="space-y-4">
               {cart.map((item) => (
-                <div key={item.id} className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+                <div
+                  key={item.id}
+                  className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100"
+                >
                   <div className="flex-grow">
                     <h4 className="font-bold text-gray-800">{item.name}</h4>
                     <p className="text-sm text-blue-600 font-medium">
                       ৳{item.price} x {item.quantity}
                     </p>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => removeFromCart(item.id)}
                   >
                     <Trash2 size={18} className="text-red-500" />
@@ -74,7 +77,7 @@ export function CartSheet() {
               <span>Total:</span>
               <span className="text-blue-700">৳{totalPrice}</span>
             </div>
-            
+
             <SheetClose asChild>
               <Link href="/checkout" className="w-full block">
                 <Button className="w-full py-7 rounded-2xl bg-blue-600 hover:bg-blue-700 text-lg font-bold text-white transition-transform active:scale-[0.98]">

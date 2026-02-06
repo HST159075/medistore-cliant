@@ -23,6 +23,8 @@ interface Order {
   items: OrderItem[];
 }
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function CustomerPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,7 +32,7 @@ export default function CustomerPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/orders", {
+        const res = await fetch(`${backendUrl}/api/orders`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -70,7 +72,7 @@ export default function CustomerPage() {
 
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto text-black">
-      <h1 className="text-3xl font-bold mb-8">Welcome to Your Profile 🛒</h1>
+      <h1 className="text-3xl font-bold mb-8">Welcome to Your Profile</h1>
 
       <div className="grid gap-6">
         <h2 className="text-xl font-semibold flex items-center gap-2">

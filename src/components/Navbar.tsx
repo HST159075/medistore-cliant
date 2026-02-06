@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { ShoppingCart, Pill } from "lucide-react";
-import { Button } from "@/components/ui/button"; // Make sure shadcn button is installed
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 text-blue-600 font-bold text-xl"
@@ -15,7 +14,6 @@ const Navbar = () => {
           <span className="tracking-tight">MediStore</span>
         </Link>
 
-        {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
           <Link
             href="/"
@@ -37,9 +35,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Actions Section */}
         <div className="flex items-center gap-3">
-          {/* Cart Icon using shadcn ghost button style */}
           <Button
             variant="ghost"
             size="icon"
@@ -54,7 +50,6 @@ const Navbar = () => {
             </Link>
           </Button>
 
-          {/* Login Button using shadcn primary style */}
           <Button
             asChild
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg"

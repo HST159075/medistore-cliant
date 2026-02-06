@@ -25,6 +25,8 @@ interface Medicine {
   seller?: { name: string };
 }
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function ShopPage() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [search, setSearch] = useState("");
@@ -36,7 +38,7 @@ export default function ShopPage() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/medicines?search=${search}`,
+        `${backendUrl}/api/medicines?search=${search}`,
       );
       const result = await response.json();
 

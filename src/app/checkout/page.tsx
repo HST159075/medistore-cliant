@@ -10,6 +10,8 @@ import { ShoppingBag, Truck, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth.client";
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function CheckoutPage() {
   const { cart, totalPrice, clearCart } = useCart();
   const router = useRouter();
@@ -21,7 +23,6 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
 
-  
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/login?callbackUrl=/checkout");
@@ -37,7 +38,7 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/orders", {
+      const res = await fetch(`${backendUrl}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +53,7 @@ export default function CheckoutPage() {
           address: address,
           phone: phone,
         }),
-        credentials: "include", 
+        credentials: "include",
       });
 
       const result = await res.json();
@@ -101,7 +102,6 @@ export default function CheckoutPage() {
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-       
         <div className="space-y-6">
           <Card className="border-none shadow-md bg-white">
             <CardHeader>

@@ -28,7 +28,7 @@ export default function Home() {
 
         <div className="container mx-auto flex flex-col items-center text-center relative z-10">
           <Badge className="mb-6 bg-blue-600 text-white hover:bg-blue-700 border-none px-6 py-1.5 rounded-full text-sm font-semibold animate-bounce">
-            Flash Delivery is Now Live! 
+            Flash Delivery is Now Live!
           </Badge>
           <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-6 leading-[1.1] tracking-tight">
             Your Trusted <span className="text-blue-600">Digital</span> <br />
@@ -263,7 +263,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* NEW SECTION: SELLER CTA - Join the platform */}
       <section className="container mx-auto px-4">
         <div className="bg-blue-600 rounded-[50px] p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between shadow-2xl shadow-blue-300">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full -mr-20 -mt-20 opacity-50 shadow-inner"></div>

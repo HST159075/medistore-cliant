@@ -1,7 +1,7 @@
 "use client";
 
 import { LayoutDashboard, ShoppingBag, Settings, User } from "lucide-react";
-import Link from "next/link"; // ✅ Link ইমপোর্ট নিশ্চিত করুন
+import Link from "next/link"; 
 import {
   Sidebar,
   SidebarContent,
@@ -15,7 +15,7 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "My Orders", url: "/dashboard/customer", icon: ShoppingBag }, // ✅ সঠিক পাথ
+  { title: "My Orders", url: "/dashboard/customer", icon: ShoppingBag },
   { title: "Profile", url: "/dashboard/profile", icon: User },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
@@ -33,9 +33,14 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex items-center gap-3 p-6 hover:bg-blue-50">
+                    <Link
+                      href={item.url}
+                      className="flex items-center gap-3 p-6 hover:bg-blue-50"
+                    >
                       <item.icon className="h-5 w-5 text-gray-500" />
-                      <span className="font-medium text-gray-700">{item.title}</span>
+                      <span className="font-medium text-gray-700">
+                        {item.title}
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
