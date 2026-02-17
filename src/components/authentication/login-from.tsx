@@ -26,7 +26,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -45,40 +44,48 @@ export function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    await authClient.signIn.email(
-      {
-        email: values.email,
-        password: values.password,
-      },
-      {
-        onRequest: () => setLoading(true),
-        onResponse: () => setLoading(false),
-        onError: (ctx) => {
-          alert(ctx.error.message || "Invalid credentials");
+    try {
+     
+      await authClient.signIn.email(
+        {
+          email: values.email,
+          password: values.password,
         },
-        onSuccess: async () => {
-  const { data: sessionData } = await authClient.getSession();
-  const user = sessionData?.user;
-  
-  const userRole =
-    user && "role" in user
-      ? (user.role as string).toUpperCase()
-      : "CUSTOMER";
+        {
+          onRequest: () => setLoading(true),
+          onResponse: () => setLoading(false),
+          onError: (ctx) => {
+            alert(ctx.error.message || "Invalid credentials");
+          },
+          onSuccess: async () => {
+            const { data: sessionData } = await authClient.getSession();
+            const user = sessionData?.user;
 
+            const userRole =
+              user && "role" in user
+                ? (user.role as string).toUpperCase()
+                : "CUSTOMER";
 
+            if (userRole === "ADMIN") {
+              router.push("/admin-dashboard");
+            } else if (userRole === "SELLER") {
+              router.push("/seller-dashboard");
+            } else {
+              router.push("/dashboard");
+            }
 
-  if (userRole === "ADMIN") {
-    router.push("/admin-dashboard"); 
-  } else if (userRole === "SELLER") {
-    router.push("/seller-dashboard"); 
-  } else {
-    router.push("/dashboard"); 
-  }
-
-  router.refresh();
-},
-      },
-    );
+            router.refresh();
+          },
+        },
+      );
+    } catch (err) {
+      // এই অংশটি "Failed to fetch" বা নেটওয়ার্ক এরর হ্যান্ডেল করবে
+      setLoading(false);
+      console.error("Fetch error details:", err);
+      alert(
+        "সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে আপনার ইন্টারনেট চেক করুন অথবা ব্যাকএন্ড সার্ভার সচল আছে কি না নিশ্চিত করুন।",
+      );
+    }
   }
 
   return (
