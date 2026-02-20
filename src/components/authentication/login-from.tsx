@@ -79,11 +79,10 @@ export function LoginForm() {
         },
       );
     } catch (err) {
-      // এই অংশটি "Failed to fetch" বা নেটওয়ার্ক এরর হ্যান্ডেল করবে
       setLoading(false);
       console.error("Fetch error details:", err);
       alert(
-        "সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে আপনার ইন্টারনেট চেক করুন অথবা ব্যাকএন্ড সার্ভার সচল আছে কি না নিশ্চিত করুন।",
+        " Baseurl error",
       );
     }
   }
