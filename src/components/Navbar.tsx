@@ -42,7 +42,7 @@ const Navbar = () => {
             asChild
             className="relative rounded-full"
           >
-            <Link href="/cart">
+            <Link href="/checkout">
               <ShoppingCart className="h-5 w-5 text-gray-600" />
               <span className="absolute top-1 right-1 bg-blue-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
                 0

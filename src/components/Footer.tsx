@@ -14,8 +14,7 @@ const Footer = () => {
           <h4 className="font-semibold mb-4">Quick Links</h4>
           <ul className="text-gray-500 space-y-2 text-sm">
             <li><Link href="/shop">Browse Medicines</Link></li>
-            <li><Link href="/about">About Us</Link></li>
-            <li><Link href="/contact">Support</Link></li>
+            <li><a href="mailto:support@medistore.com" className="hover:text-blue-600">Contact Support</a></li>
           </ul>
         </div>
         <div>
