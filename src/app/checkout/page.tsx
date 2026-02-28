@@ -1,3 +1,193 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { useCart } from "@/context/CartContext";
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// import { Separator } from "@/components/ui/separator";
+// import { ShoppingBag, Truck, CreditCard } from "lucide-react";
+// import { useRouter } from "next/navigation";
+// import { authClient } from "@/lib/auth.client";
+// import { cookies } from "next/headers";
+
+// const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://meadi-server.onrender.com";
+
+// export default function CheckoutPage() {
+//   const { cart, totalPrice, clearCart } = useCart();
+//   const router = useRouter();
+//   const [loading, setLoading] = useState(false);
+
+//   const { data: session, isPending } = authClient.useSession();
+
+//   // Form states
+//   const [address, setAddress] = useState("");
+//   const [phone, setPhone] = useState("");
+
+//   useEffect(() => {
+//     if (!isPending && !session) {
+//       router.push("/login?callbackUrl=/checkout");
+//     }
+//   }, [session, isPending, router]);
+
+//   const handlePlaceOrder = async () => {
+//     if (!address || !phone) {
+//       alert("Please provide address and phone number!");
+//       return;
+//     }
+
+//     setLoading(true);
+
+//     try {
+//       const cookiestoken = await cookies()
+//       const res = await fetch(`${backendUrl}/api/orders`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+// Cookie: cookieStore.toString(),
+//         },
+        
+//         body: JSON.stringify({
+//           items: cart.map((item) => ({
+//             medicineId: item.id,
+//             quantity: item.quantity,
+//             price: item.price,
+//           })),
+//           totalPrice: totalPrice,
+//           address: address,
+//           phone: phone,
+//         }),
+//         credentials: "include",
+//       });
+
+//       const result = await res.json();
+
+//       if (res.ok && result.success) {
+//         alert("Order Placed Successfully!");
+//         clearCart();
+//         router.push("/dashboard/customer");
+//       } else {
+//         alert(result.message || "Order failed to save!");
+//       }
+//     } catch (error) {
+//       console.error("Order error:", error);
+//       alert("Failed to connect to the server.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   if (isPending)
+//     return (
+//       <div className="h-screen flex items-center justify-center">
+//         Loading...
+//       </div>
+//     );
+
+//   if (cart.length === 0) {
+//     return (
+//       <div className="flex flex-col items-center justify-center h-[70vh] text-black">
+//         <ShoppingBag size={64} className="text-gray-300 mb-4" />
+//         <h2 className="text-2xl font-bold">Your cart is empty!</h2>
+//         <Button
+//           onClick={() => router.push("/shop")}
+//           className="mt-4 bg-blue-600"
+//         >
+//           Back to Shop
+//         </Button>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="container mx-auto py-10 px-4 text-black">
+//       <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+//         <CreditCard className="text-blue-600" /> Checkout Order
+//       </h1>
+
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+//         <div className="space-y-6">
+//           <Card className="border-none shadow-md bg-white">
+//             <CardHeader>
+//               <CardTitle className="text-xl flex items-center gap-2">
+//                 <Truck size={20} className="text-blue-600" /> Shipping
+//                 Information
+//               </CardTitle>
+//             </CardHeader>
+//             <CardContent className="space-y-4">
+//               <div>
+//                 <label className="text-sm font-semibold text-gray-600">
+//                   Full Delivery Address
+//                 </label>
+//                 <Input
+//                   placeholder="Example: House 12, Road 5, Dhanmondi, Dhaka"
+//                   className="mt-1 bg-gray-50 text-black border-gray-200 h-12 rounded-lg"
+//                   value={address}
+//                   onChange={(e) => setAddress(e.target.value)}
+//                 />
+//               </div>
+//               <div>
+//                 <label className="text-sm font-semibold text-gray-600">
+//                   Contact Number
+//                 </label>
+//                 <Input
+//                   placeholder="017XXXXXXXX"
+//                   className="mt-1 bg-gray-50 text-black border-gray-200 h-12 rounded-lg"
+//                   value={phone}
+//                   onChange={(e) => setPhone(e.target.value)}
+//                 />
+//               </div>
+//             </CardContent>
+//           </Card>
+
+//           <div className="p-4 bg-amber-50 rounded-lg border border-amber-200 text-sm text-amber-800">
+//             <strong>Payment Method:</strong> Cash on Delivery (COD) is currently
+//             available for all OTC medicines.
+//           </div>
+//         </div>
+
+//         <div>
+//           <Card className="border-none shadow-md bg-white sticky top-24">
+//             <CardHeader>
+//               <CardTitle className="text-xl">Order Summary</CardTitle>
+//             </CardHeader>
+//             <CardContent className="space-y-4">
+//               {cart.map((item) => (
+//                 <div
+//                   key={item.id}
+//                   className="flex justify-between text-sm text-gray-700"
+//                 >
+//                   <span>
+//                     {item.name} (x{item.quantity})
+//                   </span>
+//                   <span className="font-bold">
+//                     ৳{item.price * item.quantity}
+//                   </span>
+//                 </div>
+//               ))}
+
+//               <Separator />
+
+//               <div className="flex justify-between text-lg font-bold">
+//                 <span>Total Amount</span>
+//                 <span className="text-blue-700">৳{totalPrice}</span>
+//               </div>
+
+//               <Button
+//                 onClick={handlePlaceOrder}
+//                 disabled={loading}
+//                 className="w-full py-6 mt-4 bg-green-600 hover:bg-green-700 text-lg font-bold text-white shadow-lg transition-all active:scale-95 rounded-xl"
+//               >
+//                 {loading ? "Processing..." : "Confirm & Place Order"}
+//               </Button>
+//             </CardContent>
+//           </Card>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }"use client";
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,23 +196,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingBag, Truck, CreditCard } from "lucide-react";
+import { ShoppingBag, Truck, CreditCard, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth.client";
+import { createOrderAction } from "@/actions/order";
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+
 
 export default function CheckoutPage() {
   const { cart, totalPrice, clearCart } = useCart();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  // Auth Session
   const { data: session, isPending } = authClient.useSession();
 
   // Form states
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
 
+  // Redirect if not logged in
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/login?callbackUrl=/checkout");
@@ -37,57 +237,55 @@ export default function CheckoutPage() {
 
     setLoading(true);
 
+    // Prepare data for the modular action
+    const orderPayload = {
+      items: cart.map((item: CartItem) => ({
+        medicineId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalPrice: totalPrice,
+      address: address,
+      phone: phone,
+    };
+
     try {
-      const res = await fetch(`${backendUrl}/api/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: cart.map((item) => ({
-            medicineId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          totalPrice: totalPrice,
-          address: address,
-          phone: phone,
-        }),
-        credentials: "include",
-      });
+      // Execute the modular logic
+      const result = await createOrderAction(orderPayload);
 
-      const result = await res.json();
-
-      if (res.ok && result.success) {
-        alert("Order Placed Successfully!");
+      if (result.success) {
+        alert(result.message);
         clearCart();
         router.push("/dashboard/customer");
       } else {
-        alert(result.message || "Order failed to save!");
+        alert(result.message);
       }
-    } catch (error) {
-      console.error("Order error:", error);
-      alert("Failed to connect to the server.");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error.message : "An unexpected error occurred.";
+      alert(err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (isPending)
+  // Loading Screen for Auth
+  if (isPending) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        Loading...
+      <div className="h-screen flex items-center justify-center bg-white text-black">
+        <Loader2 className="animate-spin mr-2" /> Checking Session...
       </div>
     );
+  }
 
+  // Empty Cart Screen
   if (cart.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[70vh] text-black">
+      <div className="flex flex-col items-center justify-center h-[70vh] text-black bg-white">
         <ShoppingBag size={64} className="text-gray-300 mb-4" />
-        <h2 className="text-2xl font-bold">Your cart is empty!</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Your cart is empty!</h2>
         <Button
           onClick={() => router.push("/shop")}
-          className="mt-4 bg-blue-600"
+          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
         >
           Back to Shop
         </Button>
@@ -96,88 +294,90 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4 text-black">
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
-        <CreditCard className="text-blue-600" /> Checkout Order
-      </h1>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 text-black">
+      <div className="container mx-auto max-w-6xl">
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+          <CreditCard className="text-blue-600" /> Checkout Order
+        </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Card className="border-none shadow-md bg-white">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Truck size={20} className="text-blue-600" /> Shipping
-                Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-semibold text-gray-600">
-                  Full Delivery Address
-                </label>
-                <Input
-                  placeholder="Example: House 12, Road 5, Dhanmondi, Dhaka"
-                  className="mt-1 bg-gray-50 text-black border-gray-200 h-12 rounded-lg"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-gray-600">
-                  Contact Number
-                </label>
-                <Input
-                  placeholder="017XXXXXXXX"
-                  className="mt-1 bg-gray-50 text-black border-gray-200 h-12 rounded-lg"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="p-4 bg-amber-50 rounded-lg border border-amber-200 text-sm text-amber-800">
-            <strong>Payment Method:</strong> Cash on Delivery (COD) is currently
-            available for all OTC medicines.
-          </div>
-        </div>
-
-        <div>
-          <Card className="border-none shadow-md bg-white sticky top-24">
-            <CardHeader>
-              <CardTitle className="text-xl">Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between text-sm text-gray-700"
-                >
-                  <span>
-                    {item.name} (x{item.quantity})
-                  </span>
-                  <span className="font-bold">
-                    ৳{item.price * item.quantity}
-                  </span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Side: Shipping Form */}
+          <div className="space-y-6">
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Truck size={20} className="text-blue-600" /> Shipping Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-semibold text-gray-600">Full Delivery Address</label>
+                  <Input
+                    placeholder="House 12, Road 5, Dhanmondi, Dhaka"
+                    className="mt-1 bg-gray-50 text-black border-gray-200 h-12 rounded-lg"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
                 </div>
-              ))}
+                <div>
+                  <label className="text-sm font-semibold text-gray-600">Contact Number</label>
+                  <Input
+                    placeholder="017XXXXXXXX"
+                    className="mt-1 bg-gray-50 text-black border-gray-200 h-12 rounded-lg"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-              <Separator />
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm text-blue-800">
+              <strong>Payment Method:</strong> Cash on Delivery (COD) is selected by default for your location.
+            </div>
+          </div>
 
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total Amount</span>
-                <span className="text-blue-700">৳{totalPrice}</span>
-              </div>
+          {/* Right Side: Order Summary */}
+          <div>
+            <Card className="border-none shadow-sm bg-white sticky top-24">
+              <CardHeader>
+                <CardTitle className="text-xl">Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="max-h-[300px] overflow-y-auto pr-2">
+                  {cart.map((item: CartItem) => (
+                    <div key={item.id} className="flex justify-between py-2 border-b border-gray-50 last:border-none">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-800">{item.name}</p>
+                        <p className="text-gray-500 text-xs">Qty: {item.quantity} x ৳{item.price}</p>
+                      </div>
+                      <span className="font-bold text-gray-700">৳{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
 
-              <Button
-                onClick={handlePlaceOrder}
-                disabled={loading}
-                className="w-full py-6 mt-4 bg-green-600 hover:bg-green-700 text-lg font-bold text-white shadow-lg transition-all active:scale-95 rounded-xl"
-              >
-                {loading ? "Processing..." : "Confirm & Place Order"}
-              </Button>
-            </CardContent>
-          </Card>
+                <Separator className="my-4" />
+
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total Amount</span>
+                  <span className="text-blue-700">৳{totalPrice}</span>
+                </div>
+
+                <Button
+                  onClick={handlePlaceOrder}
+                  disabled={loading}
+                  className="w-full py-6 mt-4 bg-green-600 hover:bg-green-700 text-lg font-bold text-white shadow-md transition-all active:scale-95 rounded-xl"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="animate-spin" /> Processing...
+                    </span>
+                  ) : (
+                    "Confirm & Place Order"
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

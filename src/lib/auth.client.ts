@@ -1,15 +1,10 @@
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL:
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://medistore-dusky.vercel.app",
-  user: {
-    additionalFields: {
-      role: {
-        type: "string",
-      },
-    },
+  baseURL: typeof window !== "undefined" ? window.location.origin : "",
+  path: "/api/auth",
+  fetchOptions: {
+    credentials: "include",
   },
 });
 

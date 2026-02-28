@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import RoleGuard from "@/components/RoleGuard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Clock } from "lucide-react";
@@ -71,7 +72,8 @@ export default function CustomerPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-6xl mx-auto text-black">
+    <RoleGuard allowedRoles={["CUSTOMER"]}>
+      <div className="p-6 md:p-10 max-w-6xl mx-auto text-black">
       <h1 className="text-3xl font-bold mb-8">Welcome to Your Profile</h1>
 
       <div className="grid gap-6">
@@ -110,6 +112,7 @@ export default function CustomerPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </RoleGuard>
   );
 }

@@ -23,12 +23,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       
     ],
     CUSTOMER: [
-      { name: "My Orders", href: "/dashboard", icon: ShoppingBag },
+      { name: "My Orders", href: "/dashboard/customer", icon: ShoppingBag },
       { name: "Profile", href: "/dashboard/profile", icon: Settings },
     ],
   };
 
   const currentMenu = user ? menuItems[user.role as keyof typeof menuItems] : [];
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="m-auto text-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">

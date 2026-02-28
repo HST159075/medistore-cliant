@@ -81,7 +81,7 @@ export default function ShopPage() {
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative w-full md:w-[450px]">
+          <div className="relative w-full md:w-96">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
               size={20}

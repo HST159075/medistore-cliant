@@ -11,6 +11,10 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Loader2 } from "lucide-react";
+
+// অ্যাকশন ইম্পোর্ট
+import { fetchUsersAction, updateUserStatusAction } from "@/actions/admin.action";
 
 interface UserData {
   id: string;
@@ -20,63 +24,60 @@ interface UserData {
   status: string;
 }
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-
 export default function AdminUsers() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch(`${backendUrl}"/api/admin/users`, {
-        credentials: "include",
-      });
-      const data = await response.json();
+  
+  const loadUsers = async () => {
+    
+    await Promise.resolve();
+    setLoading(true);
 
-      if (Array.isArray(data)) {
-        setUsers(data);
-      } else {
-        console.error("Expected array but got:", data);
-        setUsers([]);
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error);
-      setUsers([]);
-    } finally {
-      setLoading(false);
+    const result = await fetchUsersAction();
+    if (result.success) {
+      setUsers(result.data);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchUsers();
+    let isMounted = true;
+
+    const fetchData = async () => {
+      if (!isMounted) return;
+      await loadUsers();
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleStatusChange = async (userId: string, currentStatus: string) => {
     const newStatus = currentStatus === "Active" ? "Banned" : "Active";
+    
+   
+    setUsers((prev) => 
+      prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u)
+    );
 
-    try {
-      const response = await fetch(`${backendUrl}/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
+    const result = await updateUserStatusAction(userId, newStatus);
 
-      if (response.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.map((u) =>
-            u.id === userId ? { ...u, status: newStatus } : u,
-          ),
-        );
-        alert(`User is now ${newStatus}`);
-      }
-    } catch (error) {
-      alert("Failed to update status");
+    if (!result.success) {
+      alert(result.message);
+      loadUsers();
     }
   };
 
   if (loading)
     return (
-      <div className="p-10 text-center font-semibold">Loading Users...</div>
+      <div className="p-20 text-center flex flex-col items-center gap-2">
+        <Loader2 className="animate-spin text-blue-600" size={32} />
+        <p className="text-gray-500 font-medium">Loading Users...</p>
+      </div>
     );
 
   return (
@@ -96,10 +97,7 @@ export default function AdminUsers() {
           <TableBody>
             {users.length > 0 ? (
               users.map((user) => (
-                <TableRow
-                  key={user.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
+                <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
@@ -108,30 +106,21 @@ export default function AdminUsers() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        user.status === "Active" ? "default" : "destructive"
-                      }
-                    >
+                    <Badge variant={user.status === "Active" ? "default" : "destructive"}>
                       {user.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <Switch
                       checked={user.status === "Active"}
-                      onCheckedChange={() =>
-                        handleStatusChange(user.id, user.status)
-                      }
+                      onCheckedChange={() => handleStatusChange(user.id, user.status)}
                     />
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center py-20 text-gray-500"
-                >
+                <TableCell colSpan={5} className="text-center py-20 text-gray-500">
                   No users found or server error.
                 </TableCell>
               </TableRow>
