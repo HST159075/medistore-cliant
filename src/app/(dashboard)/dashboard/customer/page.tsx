@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import RoleGuard from "@/components/RoleGuard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Clock } from "lucide-react";
+import { Package, Clock, Loader2 } from "lucide-react";
+import { fetchCustomerOrdersAction } from "@/actions/order";
 
 interface OrderItem {
   id: string;
@@ -24,36 +25,27 @@ interface Order {
   items: OrderItem[];
 }
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-
 export default function CustomerPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await fetch(`${backendUrl}/api/orders`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", 
-        });
-
-        const result = await res.json();
-        if (result.success) {
-          setOrders(result.data);
-        }
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoading(false);
+  const loadOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await fetchCustomerOrdersAction();
+      if (result.success) {
+        setOrders(result.data);
       }
-    };
-
-    fetchOrders();
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   const getStatusBadge = (status: Order["status"]) => {
     const variants: Record<string, string> = {
@@ -63,9 +55,11 @@ export default function CustomerPage() {
       PROCESSING: "bg-blue-100 text-blue-700",
       SHIPPED: "bg-purple-100 text-purple-700",
     };
-    
+
     return (
-      <Badge className={`${variants[status] || "bg-gray-100"} border-none shadow-none`}>
+      <Badge
+        className={`${variants[status] || "bg-gray-100"} border-none shadow-none`}
+      >
         {status}
       </Badge>
     );
@@ -74,44 +68,60 @@ export default function CustomerPage() {
   return (
     <RoleGuard allowedRoles={["CUSTOMER"]}>
       <div className="p-6 md:p-10 max-w-6xl mx-auto text-black">
-      <h1 className="text-3xl font-bold mb-8">Welcome to Your Profile</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gray-800">
+          Welcome to Your Profile
+        </h1>
 
-      <div className="grid gap-6">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Package size={20} className="text-blue-600" /> Recent Orders
-        </h2>
+        <div className="grid gap-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <Package size={20} className="text-blue-600" /> Recent Orders
+          </h2>
 
-        {loading ? (
-          <div className="space-y-4">
-            <div className="h-24 w-full bg-gray-50 animate-pulse rounded-xl" />
-            <div className="h-24 w-full bg-gray-50 animate-pulse rounded-xl" />
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="text-center py-20 bg-gray-50 rounded-2xl border-dashed border-2">
-            <p className="text-gray-500 italic">এখনো কোনো অর্ডার পাওয়া যায়নি।</p>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {orders.map((order) => (
-              <Card key={order.id} className="border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="space-y-1">
-                    <p className="text-[10px] text-gray-400 font-mono uppercase">Order ID: {order.id.slice(-8)}</p>
-                    <p className="font-bold text-xl text-gray-900">৳{order.totalPrice}</p>
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
-                      <Clock size={14} /> {new Date(order.createdAt).toLocaleDateString("bn-BD")}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4 w-full md:w-auto justify-between">
-                    {getStatusBadge(order.status)}
-                    <button className="text-blue-600 text-sm font-semibold hover:underline">View Details</button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+              <Loader2 className="animate-spin text-blue-600" size={40} />
+              <p className="text-gray-500 animate-pulse font-medium">
+                অর্ডার লোড হচ্ছে...
+              </p>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="text-center py-20 bg-gray-50 rounded-2xl border-dashed border-2 border-gray-200">
+              <p className="text-gray-500 italic font-medium">
+                এখনো কোনো অর্ডার পাওয়া যায়নি।
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {orders.map((order) => (
+                <Card
+                  key={order.id}
+                  className="border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  <CardContent className="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">
+                        Order ID: {order.id.slice(-8)}
+                      </p>
+                      <p className="font-bold text-2xl text-gray-900">
+                        ৳{order.totalPrice}
+                      </p>
+                      <p className="text-sm text-gray-500 flex items-center gap-1">
+                        <Clock size={14} />{" "}
+                        {new Date(order.createdAt).toLocaleDateString("bn-BD")}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 w-full md:w-auto justify-between border-t md:border-none pt-4 md:pt-0">
+                      {getStatusBadge(order.status)}
+                      <button className="text-blue-600 text-sm font-bold hover:text-blue-800 transition-colors">
+                        View Details
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </RoleGuard>
   );
