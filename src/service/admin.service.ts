@@ -1,7 +1,21 @@
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const AdminService = {
-  // সব ইউজারদের লিস্ট আনা
+
+  getDashboardStats: async (cookieString: string) => {
+    const res = await fetch(`${backendUrl}/api/admin/stats`, {
+      headers: { 
+        Cookie: cookieString,
+        "Cache-Control": "no-cache" 
+      },
+      cache: "no-store",
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+    return await res.json();
+  },
+
+ 
   getAllUsers: async (cookieString: string) => {
     const res = await fetch(`${backendUrl}/api/admin/users`, {
       headers: { Cookie: cookieString },
@@ -12,17 +26,22 @@ export const AdminService = {
     return await res.json();
   },
 
-  // ইউজারের স্ট্যাটাস (Ban/Unban) আপডেট করা
+
   updateUserStatus: async (userId: string, status: string, cookieString: string) => {
-    const res = await fetch(`${backendUrl}/api/admin/users/${userId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieString,
-      },
-      credentials: "include",
-      body: JSON.stringify({ status }),
-    });
-    return res;
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/users/${userId}`, {
+        method: "PATCH", 
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieString,
+        },
+        credentials: "include",
+        body: JSON.stringify({ status }), 
+      });
+      return res;
+    } catch (error) {
+      console.error("Update user status error:", error);
+      throw error;
+    }
   },
 };

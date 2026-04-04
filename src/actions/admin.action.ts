@@ -16,17 +16,22 @@ export async function fetchUsersAction() {
   }
 }
 
-export async function updateUserStatusAction(userId: string, newStatus: string) {
+export async function updateUserStatusAction(userId: string, isActive: boolean) {
   try {
     const cookieStore = await cookies();
-    const res = await AdminService.updateUserStatus(userId, newStatus, cookieStore.toString());
+    const res = await AdminService.updateUserStatus(userId, isActive, cookieStore.toString());
 
     if (res.ok) {
       revalidatePath("/admin-dashboard/users");
-      return { success: true, message: `User status updated to ${newStatus}` };
+      return { success: true, message: `User ${isActive ? "activated" : "banned"} successfully` };
     }
-    return { success: false, message: "Server failed to update status" };
+    
+    // Log the response for debugging
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Status update failed:", res.status, errorData);
+    return { success: false, message: errorData.message || "Server failed to update status" };
   } catch (error) {
+    console.error("Update status error:", error);
     return { success: false, message: "Network error" };
   }
 }

@@ -8,35 +8,20 @@ import type { OrderPayload } from "@/types/order";
 export async function createOrderAction(orderPayload: OrderPayload) {
   try {
     const cookieStore = await cookies();
-
-    // সার্ভিস কল করা
     const { status, data } = await OrderService.createOrder(
       orderPayload,
       cookieStore.toString(),
     );
+
     if (status === 201 || (status === 200 && data.success)) {
+      // এই পাথগুলো রিভ্যালিডেট করা জরুরি
       revalidatePath("/dashboard/customer");
       revalidatePath("/admin-dashboard/orders");
-      return {
-        success: true,
-        message: "Order placed successfully!",
-        order: data.order,
-      };
+      return { success: true, message: "Order placed successfully!", order: data.order };
     }
-    return {
-      success: false,
-      message: data.message || "Failed to place order.",
-    };
-  } catch (error: unknown) {
-    console.error("Order Action Error:", error);
-
-    const errorMessage =
-      error instanceof Error ? error.message : "Server connection failed";
-
-    return {
-      success: false,
-      message: errorMessage,
-    };
+    return { success: false, message: data.message || "Failed to place order." };
+  } catch {
+    return { success: false, message: "Server connection failed" };
   }
 }
 
@@ -45,13 +30,35 @@ export async function fetchCustomerOrdersAction() {
     const cookieStore = await cookies();
     const result = await OrderService.getCustomerOrders(cookieStore.toString());
     
-    // API যদি সাকসেস হয় (আপনার ব্যাকএন্ডের রেসপন্স অনুযায়ী চেক করবেন)
-    return { 
-      success: true, 
-      data: Array.isArray(result) ? result : (result.data || []) 
-    };
-  } catch (error) {
-    console.error("Fetch Orders Action Error:", error);
-    return { success: false, data: [], message: "অর্ডার লোড করতে সমস্যা হয়েছে।" };
+    // ব্যাকএন্ড যদি { success: true, data: [...] } পাঠায় তবে এটি কাজ করবে
+    if (result?.success && Array.isArray(result.data)) {
+      return { success: true, data: result.data };
+    }
+    // যদি ব্যাকএন্ড সরাসরি অ্যারে পাঠায়
+    if (Array.isArray(result)) {
+      return { success: true, data: result };
+    }
+    
+    return { success: false, data: [] };
+  } catch {
+    return { success: false, data: [] };
+  }
+}
+
+export async function fetchAdminOrdersAction() {
+  try {
+    const cookieStore = await cookies();
+    const result = await OrderService.getAdminOrders(cookieStore.toString());
+
+    if (result?.success && Array.isArray(result.data)) {
+      return { success: true, data: result.data };
+    }
+    if (Array.isArray(result)) {
+      return { success: true, data: result };
+    }
+
+    return { success: false, data: [] };
+  } catch {
+    return { success: false, data: [] };
   }
 }

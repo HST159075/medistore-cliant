@@ -62,7 +62,7 @@ export default function CheckoutPage() {
       } else {
         alert(result.message);
       }
-    } catch (error) {
+    } catch {
       alert("An unexpected error occurred.");
     } finally {
       setLoading(false);
@@ -76,7 +76,7 @@ export default function CheckoutPage() {
       </div>
     );
 
-  if (cart.length === 0)
+  if (!cart || cart.length === 0)
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-black">
         <ShoppingBag size={64} className="text-gray-300 mb-4" />
@@ -144,7 +144,7 @@ export default function CheckoutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="max-h-[300px] overflow-y-auto">
+                <div className="max-h-72 overflow-y-auto">
                   {cart.map((item: CartItem) => (
                     <div
                       key={item.id}

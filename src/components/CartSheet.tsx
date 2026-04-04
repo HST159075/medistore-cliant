@@ -21,7 +21,7 @@ export function CartSheet() {
       <SheetTrigger asChild>
         <Button variant="outline" className="relative border-blue-200">
           <ShoppingCart size={20} className="text-blue-600" />
-          {cart.length > 0 && (
+          {cart && cart.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold">
               {cart.length}
             </span>
@@ -29,7 +29,7 @@ export function CartSheet() {
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="bg-white text-black flex flex-col h-full w-[350px] sm:w-[400px]">
+      <SheetContent className="bg-white text-black flex flex-col h-full w-87.5 sm:w-100">
         <SheetHeader className="border-b pb-4">
           <SheetTitle className="text-2xl font-bold flex items-center gap-2 text-black">
             <ShoppingCart className="text-blue-600" /> Your Cart
@@ -40,8 +40,8 @@ export function CartSheet() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-grow overflow-y-auto mt-6 pr-2 text-black">
-          {cart.length === 0 ? (
+        <div className="grow overflow-y-auto mt-6 pr-2 text-black">
+          {!cart || cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 text-gray-400">
               <p>Your cart is empty</p>
             </div>
@@ -52,7 +52,7 @@ export function CartSheet() {
                   key={item.id}
                   className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100"
                 >
-                  <div className="flex-grow">
+                  <div className="grow">
                     <h4 className="font-bold text-gray-800">{item.name}</h4>
                     <p className="text-sm text-blue-600 font-medium">
                       ৳{item.price} x {item.quantity}
@@ -71,7 +71,7 @@ export function CartSheet() {
           )}
         </div>
 
-        {cart.length > 0 && (
+        {cart && cart.length > 0 && (
           <div className="border-t pt-6 space-y-4">
             <div className="flex justify-between text-xl font-extrabold text-gray-900 px-1">
               <span>Total:</span>

@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import RoleGuard from "@/components/RoleGuard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Clock, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, Clock, Loader2, RefreshCw } from "lucide-react";
 import { fetchCustomerOrdersAction } from "@/actions/order";
 
 interface OrderItem {
@@ -33,11 +34,14 @@ export default function CustomerPage() {
     try {
       setLoading(true);
       const result = await fetchCustomerOrdersAction();
-      if (result.success) {
+      if (result.success && Array.isArray(result.data)) {
         setOrders(result.data);
+      } else {
+        setOrders([]);
       }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+    } catch (_error) {
+      console.error("Error fetching orders:", _error);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -45,6 +49,15 @@ export default function CustomerPage() {
 
   useEffect(() => {
     loadOrders();
+  }, [loadOrders]);
+
+  // Auto-refresh orders when entering the page (in case of new orders)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadOrders();
+    }, 1500); // Refresh after 1.5 seconds to ensure backend has processed the order
+
+    return () => clearTimeout(timer);
   }, [loadOrders]);
 
   const getStatusBadge = (status: Order["status"]) => {
@@ -73,9 +86,21 @@ export default function CustomerPage() {
         </h1>
 
         <div className="grid gap-6">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Package size={20} className="text-blue-600" /> Recent Orders
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Package size={20} className="text-blue-600" /> Recent Orders
+            </h2>
+            <Button
+              onClick={loadOrders}
+              disabled={loading}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+              Refresh
+            </Button>
+          </div>
 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">

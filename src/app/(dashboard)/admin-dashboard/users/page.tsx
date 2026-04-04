@@ -21,12 +21,13 @@ interface UserData {
   name: string;
   email: string;
   role: string;
-  status: string;
+  status: boolean;
 }
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
 
   
   const loadUsers = async () => {
@@ -56,20 +57,25 @@ export default function AdminUsers() {
     };
   }, []);
 
-  const handleStatusChange = async (userId: string, currentStatus: string) => {
-    const newStatus = currentStatus === "Active" ? "Banned" : "Active";
+  const handleStatusChange = async (userId: string, currentStatus: boolean) => {
+    const newStatus = !currentStatus; // Toggle boolean
+    const previousUsers = users;
     
-   
+    // Optimistic update
     setUsers((prev) => 
       prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u)
     );
+    setStatusUpdating(userId);
 
     const result = await updateUserStatusAction(userId, newStatus);
 
     if (!result.success) {
       alert(result.message);
-      loadUsers();
+      // Revert the optimistic update
+      setUsers(previousUsers);
     }
+    
+    setStatusUpdating(null);
   };
 
   if (loading)
@@ -87,7 +93,7 @@ export default function AdminUsers() {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead className="w-[200px]">Name</TableHead>
+              <TableHead className="w-50">Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
@@ -106,14 +112,15 @@ export default function AdminUsers() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.status === "Active" ? "default" : "destructive"}>
-                      {user.status}
+                    <Badge variant={user.status ? "default" : "destructive"}>
+                      {user.status ? "Active" : "Banned"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <Switch
-                      checked={user.status === "Active"}
+                      checked={user.status}
                       onCheckedChange={() => handleStatusChange(user.id, user.status)}
+                      disabled={statusUpdating === user.id}
                     />
                   </TableCell>
                 </TableRow>
